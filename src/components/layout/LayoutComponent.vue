@@ -124,6 +124,8 @@ defineProps({
         >
           {{ HeaderTitle }}
         </ion-title>
+
+        <slot name="HeaderButton" />
       </ion-toolbar>
     </ion-header>
 
@@ -141,6 +143,8 @@ defineProps({
           <ion-title :size="HeaderTitleSize" :class="HeaderTitleClass">
             {{ HeaderTitle }}
           </ion-title>
+
+          <slot name="HeaderContentButton" />
         </ion-toolbar>
       </ion-header>
 

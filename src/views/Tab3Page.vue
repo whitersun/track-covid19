@@ -6,6 +6,7 @@ export default {
 
 <script setup>
 import {
+  IonButtons,
   IonButton,
   IonIcon,
   IonList,
@@ -14,8 +15,9 @@ import {
   IonImg,
   IonLabel,
   IonSkeletonText,
+  isPlatform,
 } from "@ionic/vue";
-import { logoFacebook } from "ionicons/icons";
+import { logoFacebook, logOutOutline } from "ionicons/icons";
 
 import { computed, onBeforeMount, ref } from "vue";
 
@@ -50,12 +52,17 @@ async function imageLoaded() {
   imgLoad.value = true;
 }
 
+const isIos = ref(false);
+
 onBeforeMount(async () => {
   console.log(getFbData.value);
 
   if (!getFbData.value) {
     await DefineFacebookAccessToken();
   }
+
+  if (isPlatform("ios")) isIos.value = true;
+  else isIos.value = false;
 });
 </script>
 
@@ -77,10 +84,41 @@ onBeforeMount(async () => {
   display: block;
   opacity: 1;
 }
+
+ion-img.avatar-style::part(image) {
+  margin: auto;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+}
+
+ion-icon.rotation-icon {
+  transform: rotate(180deg);
+}
+
+ion-note.text-note {
+  font-size: 14px;
+}
+
+ion-skeleton-text.img-skeleton-loading {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}
 </style>
 
 <template>
-  <LayoutComponent mode="ios" HeaderTitle="Personal" HeaderTitleClass="text-uppercase">
+  <LayoutComponent
+    HeaderTitle="Personal"
+    HeaderTitleClass="text-uppercase"
+    HeaderTitleSize="large"
+    :HeaderToolbarColor="isIos ? 'transparent' : 'light'"
+  >
     <ion-button
       v-if="!getFbData"
       expand="block"
@@ -93,6 +131,7 @@ onBeforeMount(async () => {
 
     <slot v-if="getFbData">
       <ion-img
+        class="avatar-style ion-padding ion-margin-vertical"
         :class="[imgLoad ? 'show' : 'hide']"
         :src="getFbData.picture.data.url"
         @ionImgWillLoad="imageIsLoading"
@@ -100,40 +139,60 @@ onBeforeMount(async () => {
       ></ion-img>
 
       <ion-skeleton-text
-        v-if="!imgLoad"
-        class="ion-no-margin"
         animated
-        style="width: 100%; height: 25rem"
+        v-if="!imgLoad"
+        class="img-skeleton-loading"
       ></ion-skeleton-text>
 
       <ion-list class="ion-margin-vertical" lines="none">
         <ion-item>
           <ion-label>ID:</ion-label>
-          <ion-note>{{ getFbData.id }}</ion-note>
+          <ion-note v-if="getFbData" slot="end" class="text-note">{{
+            getFbData.id
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
         <ion-item>
           <ion-label>Email:</ion-label>
-          <ion-note>{{ getFbData.email }}</ion-note>
+          <ion-note v-if="getFbData" slot="end" class="text-note">{{
+            getFbData.email
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
         <ion-item>
           <ion-label>username:</ion-label>
-          <ion-note>{{ getFbData.name }}</ion-note>
+          <ion-note v-if="getFbData" slot="end" class="text-note">{{
+            getFbData.name
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
         <ion-item>
           <ion-label>Gender:</ion-label>
-          <ion-note>{{ getFbData.gender }}</ion-note>
+          <ion-note v-if="getFbData.gender" slot="end" class="text-note">{{
+            getFbData.gender
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
         <ion-item>
           <ion-label>Birthday:</ion-label>
-          <ion-note>{{ getFbData.birthday }}</ion-note>
+          <ion-note v-if="getFbData" slot="end" class="text-note">{{
+            getFbData.birthday
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
         <ion-item>
           <ion-label>Hometown:</ion-label>
-          <ion-note>{{ getFbData.hometown.name }}</ion-note>
+          <ion-note v-if="getFbData" slot="end" class="text-note">{{
+            getFbData.hometown.name
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
         <ion-item>
           <ion-label>Current Location:</ion-label>
-          <ion-note>{{ getFbData.location.name }}</ion-note>
+          <ion-note v-if="getFbData" slot="end" class="text-note">{{
+            getFbData.location.name
+          }}</ion-note>
+          <ion-skeleton-text v-else animated style="width: 50%"></ion-skeleton-text>
         </ion-item>
       </ion-list>
     </slot>
@@ -144,15 +203,36 @@ onBeforeMount(async () => {
       ></ion-img>
     </slot>
 
-    <ion-button
-      v-if="getFbData"
-      class="ion-margin-bottom"
-      expand="block"
-      color="danger"
-      v-on:click="LogoutFacebook()"
-    >
-      <ion-icon slot="start" :icon="logoFacebook"></ion-icon>
-      log out
-    </ion-button>
+    <template v-if="!isIos" #HeaderButton>
+      <ion-buttons slot="end">
+        <ion-button
+          v-if="getFbData"
+          class="ion-margin-bottom"
+          expand="fill"
+          color="danger"
+          size="small"
+          v-on:click="LogoutFacebook()"
+        >
+          <ion-icon class="rotation-icon" slot="start" :icon="logOutOutline"></ion-icon>
+          log out
+        </ion-button>
+      </ion-buttons>
+    </template>
+
+    <template v-if="isIos" #HeaderContentButton>
+      <ion-buttons slot="end">
+        <ion-button
+          v-if="getFbData"
+          class="ion-margin-bottom"
+          expand="fill"
+          color="danger"
+          size="small"
+          v-on:click="LogoutFacebook()"
+        >
+          <ion-icon class="rotation-icon" slot="start" :icon="logOutOutline"></ion-icon>
+          log out
+        </ion-button>
+      </ion-buttons>
+    </template>
   </LayoutComponent>
 </template>
