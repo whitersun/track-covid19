@@ -1,63 +1,10 @@
 <script setup>
 import { defineProps } from "vue";
-import { IonItemGroup, IonItemDivider, IonLabel, IonItem } from "@ionic/vue";
+import { IonList, IonNote, IonSkeletonText, IonLabel, IonItem } from "@ionic/vue";
 import ModalLayout from "@/components/modules/ModalLayout.vue";
+import TitleComponent from "@/components/atoms/TitleComponent.vue";
 
-const props = defineProps({
-  mode: {
-    type: String,
-    required: false,
-  },
-
-  HeaderClass: {
-    type: String,
-    required: false,
-  },
-
-  HeaderTranslucent: {
-    type: Boolean,
-    required: false,
-    default: true,
-  },
-
-  HeaderStyle: {
-    type: String,
-    required: false,
-  },
-
-  HeaderToolbarColor: {
-    type: String,
-    required: false,
-    default: "transparent",
-
-    validator: (value) => {
-      var _HeaderToolbarColor = [
-        "primary",
-        "secondary",
-        "tertiary",
-        "success",
-        "warning",
-        "danger",
-        "light",
-        "medium",
-        "dark",
-        "transparent",
-      ];
-
-      return _HeaderToolbarColor.includes(value);
-    },
-  },
-
-  HeaderToolbarClass: {
-    type: String,
-    required: false,
-  },
-
-  HeaderToolbarStyle: {
-    type: String,
-    required: false,
-  },
-
+defineProps({
   HeaderTitleSize: {
     type: String,
     required: false,
@@ -75,11 +22,6 @@ const props = defineProps({
   },
 
   HeaderTitleStyle: {
-    type: String,
-    required: false,
-  },
-
-  HeaderTitle: {
     type: String,
     required: false,
   },
@@ -106,17 +48,12 @@ const props = defineProps({
     required: false,
   },
 
-  Label: {
-    type: String,
-    required: false,
-  },
-
-  ListHeader: {
-    type: String,
-    required: false,
-  },
-
   TitleClassName: {
+    type: String,
+    required: false,
+  },
+
+  HeaderClass: {
     type: String,
     required: false,
   },
@@ -126,44 +63,57 @@ const props = defineProps({
     required: false,
   },
 });
-
-console.log(props.HeaderTitle);
 </script>
 
 <style lang="scss" scoped></style>
 
 <template>
   <ModalLayout
-    :mode="mode"
+    HeaderToolbarColor="transparent"
     :HeaderClass="HeaderClass"
-    :HeaderTitle="HeaderTitle"
-    :HeaderTranslucent="HeaderTranslucent"
-    :HeaderStyle="HeaderStyle"
-    :HeaderToolbarColor="HeaderToolbarColor"
-    :HeaderToolbarClass="HeaderToolbarClass"
-    :HeaderToolbarStyle="HeaderToolbarStyle"
-    :HeaderTitleSize="HeaderTitleSize"
-    :HeaderTitleClass="HeaderTitleClass"
-    :HeaderTitleStyle="HeaderTitleStyle"
-    :HeaderCollapse="HeaderCollapse"
-    :ContentFullScreen="ContentFullScreen"
+    :HeaderTitle="ArrayItem.country"
+    :HeaderTranslucent="false"
     @CloseButton="ModalCloseButton($event)"
   >
-    <title-component
-      :Mode="mode"
-      :Label="Label"
-      :ListHeader="ListHeader"
+    <TitleComponent
+      ListHeader="Date"
+      :Label="ArrayItem.day"
       :ClassName="TitleClassName"
     />
 
-    <ion-item-group v-if="ArrayItem">
-      <ion-item-divider>
-        <ion-label>{{ ArrayItem.cases }}</ion-label>
-      </ion-item-divider>
-
-      <ion-item v-for="(index, item) in ArrayItem" :key="index">
-        <ion-label>{{ item.cases.new }}</ion-label>
+    <ion-list v-if="ArrayItem">
+      <ion-item>
+        <ion-label>new</ion-label>
+        <ion-note>{{ ArrayItem.cases.new }}</ion-note>
       </ion-item>
-    </ion-item-group>
+      <ion-item>
+        <ion-label>total</ion-label>
+        <ion-note>{{ ArrayItem.cases.total }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>active</ion-label>
+        <ion-note>{{ ArrayItem.cases.active }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>critical</ion-label>
+        <ion-note>{{ ArrayItem.cases.critical }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>recovered</ion-label>
+        <ion-note>{{ ArrayItem.cases.recovered }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>deaths total</ion-label>
+        <ion-note>{{ ArrayItem.deaths.total }}</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-label>deaths new</ion-label>
+        <ion-note>{{ ArrayItem.deaths.new }}</ion-note>
+      </ion-item>
+    </ion-list>
+
+    <ion-list v-else>
+      <ion-skeleton-text animated style="width: 100%; height: 25rem"></ion-skeleton-text>
+    </ion-list>
   </ModalLayout>
 </template>

@@ -106,7 +106,7 @@ async function submitSearch(value) {
         componentProps: {
           mode: "ios",
           HeaderTitle: propsSearchItem.country,
-          HeaderClass: "ModalComponentHeader",
+          HeaderClass: "ModalComponentHeader ion-margin-vertical ion-padding-end",
           TitleClassName: "ModalClassTitle",
           ArrayItem: propsSearchItem,
         },
@@ -220,6 +220,10 @@ ion-modal.ModalComponent::part(content) {
 }
 
 ion-modal.ModalComponent {
+  ion-header {
+    padding-left: 0.75rem;
+  }
+
   ion-header ion-toolbar ion-title {
     text-transform: uppercase;
   }

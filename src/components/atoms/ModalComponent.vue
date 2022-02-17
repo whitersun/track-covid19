@@ -130,6 +130,11 @@ defineProps({
     type: String,
     required: false,
   },
+
+  ContentHeader: {
+    type: String,
+    required: false,
+  },
 });
 </script>
 
@@ -164,6 +169,7 @@ defineProps({
 
     <ion-content :mode="mode" :fullscreen="ContentFullScreen">
       <ion-header
+        v-if="ContentHeader"
         :collapse="HeaderCollapse"
         :translucent="HeaderTranslucent"
         :style="HeaderToolbarStyle"
