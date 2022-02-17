@@ -1,0 +1,15 @@
+{
+	"appId": "com.track.covid19",
+	"appName": "track-covid19",
+	"webDir": "dist",
+	"bundledWebRuntime": false,
+	"server": {
+		"hostname": "com.track.covid19",
+		"url": "http://192.168.31.239:3200/",
+		"cleartext": true,
+		"allowNavigation": [
+			"com.track.covid19",
+			"http://192.168.31.239:3200/"
+		]
+	}
+}

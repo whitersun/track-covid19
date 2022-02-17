@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">track-covid19</string>
+    <string name="title_activity_main">track-covid19</string>
+    <string name="package_name">com.track.covid19</string>
+    <string name="custom_url_scheme">com.track.covid19</string>
+    <string name="facebook_app_id">936359327018446</string>
+    <string name="facebook_client_token">c987f1b7b9ecc259d13d90a6823d6a44</string>
+    <string name="fb_login_protocol_scheme">936359327018446</string>
+</resources>
