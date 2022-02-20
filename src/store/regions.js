@@ -6,6 +6,7 @@ export const regions = {
   state: {
     errors: false,
     regions: [],
+    UserInCurrent: '',
 
     TotalReports: '',
 
@@ -19,6 +20,10 @@ export const regions = {
 
     GET_TOTAL_REPORTS: (state, payload) => {
       return state.TotalReports = payload;
+    },
+
+    GET_USER_IN_CURRENT_COUNTRY: (state, payload) => {
+      return state.UserInCurrent = payload;
     }
   },
 
@@ -57,9 +62,9 @@ export const regions = {
     CALL_TOTAL_REPORT: async ({ commit, state }) => {
       var options = {
         method: 'GET',
-        url: 'https://covid-19-data.p.rapidapi.com/totals',
+        url: 'https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/npm-covid-data/world',
         headers: {
-          'x-rapidapi-host': 'covid-19-data.p.rapidapi.com',
+          'x-rapidapi-host': 'vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com',
           'x-rapidapi-key': '8c7a059f13msh4c6f40d43aa46eap13a1f5jsn98c5631df848'
         }
       };
@@ -67,11 +72,21 @@ export const regions = {
       const response = await axios.request(options);
 
       if (response.status === 200) {
+        console.log(response.data[0])
         commit('GET_TOTAL_REPORTS', response.data[0]);
 
         state.loading = false;
 
         return state.loading;
+      }
+    },
+
+    CALL_GET_CURRENT_COUNTRY: async ({ commit }) => {
+      const response = await axios.get('https://ipapi.co/json/');
+
+      if (response.status === 200) {
+        // console.log(response);
+        commit('GET_USER_IN_CURRENT_COUNTRY', response.data)
       }
     }
   }

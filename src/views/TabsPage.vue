@@ -29,7 +29,10 @@ import { FacebookLoginExtension } from "@/hooks/Facebook";
 import { useStore } from "vuex";
 import { computed } from "@vue/runtime-core";
 
-const { DefineFacebookAccessToken } = FacebookLoginExtension();
+const {
+  DefineFacebookAccessToken,
+  AsyncDetectedLoginWithFacebook,
+} = FacebookLoginExtension();
 
 const store = useStore();
 
@@ -38,12 +41,14 @@ const ObserverUserLogin = computed(() => {
 });
 
 async function beforeTabChange(event) {
+  const { isLoginWithFacebook } = AsyncDetectedLoginWithFacebook();
+
   switch (event.tab) {
     case "tab3": {
-      console.log(ObserverUserLogin.value);
-      if (!ObserverUserLogin.value) {
-        await DefineFacebookAccessToken();
-      }
+      const ErrorList = ["", null, undefined];
+      if (ErrorList.includes(isLoginWithFacebook)) return;
+
+      if (!ObserverUserLogin.value) await DefineFacebookAccessToken();
 
       break;
     }

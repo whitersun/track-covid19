@@ -1,18 +1,14 @@
 import { createStore } from 'vuex'
 
 import { regions } from './regions'
+import { user    } from './authenticate'
 
 export default createStore({
   state: {
-    facebookUserData: '',
   },
   getters: {
   },
   mutations: {
-    USER_DATA (state, payload) {
-      return state.facebookUserData = payload;
-    }
-
   },
 
   actions: {
@@ -25,6 +21,7 @@ export default createStore({
 
   },
   modules: {
-    Region: regions
+    user,
+    Region: regions,
   }
 })

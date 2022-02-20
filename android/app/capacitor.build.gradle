@@ -17,7 +17,7 @@ dependencies {
     implementation project(':capacitor-storage')
 
 }
-
+apply from: "../../node_modules/cordova-line-login-plugin/src/android/line.gradle"
 
 if (hasProperty('postBuildExtras')) {
   postBuildExtras()

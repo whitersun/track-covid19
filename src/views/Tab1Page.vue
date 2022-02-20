@@ -116,8 +116,7 @@ async function submitSearch(value) {
         mode: "ios",
       });
 
-      await DismissLoadingComponent();
-      return modal.present();
+      return modal.present().then(async () => await DismissLoadingComponent());
     } else {
       console.log(GetSearchData.value);
       await DismissLoadingComponent();
@@ -169,7 +168,10 @@ const doRefresh = async (event) => {
 };
 
 onBeforeMount(async () => {
-  await store.dispatch("Region/CALL_TOTAL_REPORT");
+  Promise.all([
+    await store.dispatch("Region/CALL_GET_CURRENT_COUNTRY"),
+    await store.dispatch("Region/CALL_TOTAL_REPORT"),
+  ]);
 });
 </script>
 

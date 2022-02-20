@@ -7,12 +7,16 @@ import { FacebookLogin } from '@capacitor-community/facebook-login'
 import { Capacitor } from '@capacitor/core'
 import { Storage } from '@capacitor/storage'
 
+import { DetectedLoginPlatform } from './LoginPlatform'
+
 import axios from 'axios'
 
 export const FacebookLoginExtension = () => {
-
     const store = useStore();
     const userData = ref('');
+
+    const { AsyncUserLoginPlatform } = DetectedLoginPlatform();
+
 
     async function presentLoading(timeout) {
       const loading = await loadingController
@@ -27,6 +31,12 @@ export const FacebookLoginExtension = () => {
       setTimeout(function() {
         loading.dismiss()
       }, timeout);
+    }
+
+    async function AsyncDetectedLoginWithFacebook() {
+        const { value: isLoginWithFacebook } = await Storage.get({ key: 'LoginWithFacebook' });
+    
+        return { isLoginWithFacebook }
     }
 
 
@@ -56,20 +66,39 @@ export const FacebookLoginExtension = () => {
             console.log(result)
             console.log(`Facebook access token is ${result.accessToken.token}`);
 
+            await Storage.set({ key: 'LoginWithFacebook', value: true });
+
             return Promise.all([
                 await GetFacebookUserProfile(),
-                await DefineFacebookAccessToken()
-            ]);
+                await DefineFacebookAccessToken(),
+                AsyncUserLoginPlatform()
+            ]).then(async (AfterLogin) => { 
+                console.log(AfterLogin) 
+            
+                const config = 
+                {
+                    facebook: { 
+                        platform: AfterLogin[2].UserLoginWithFacebook.platform,
+                        state: AfterLogin[2].UserLoginWithFacebook.state
+                    },
+                    line: { 
+                        platform: AfterLogin[2].UserLoginWithLine.platform,
+                        state: AfterLogin[2].UserLoginWithLine.state,
+                    },
+                };
+
+                await store.dispatch("user/LoginPlatform", config);
+            })
         }
     }
 
     async function DefineFacebookAccessToken () {
         try {
             const getUserTokenAndId = ref('');
+        
             const { value: accessTokenFB } = await Storage.get({ key: 'fbAccessToken' });
             const { value: accessTokenFBId } = await Storage.get({ key: 'fbAccessId' });
         
-
             if (!accessTokenFB && !accessTokenFBId) {
 
                 getUserTokenAndId.value = await FacebookLogin.getCurrentAccessToken()
@@ -84,8 +113,6 @@ export const FacebookLoginExtension = () => {
                     value: getUserTokenAndId.value.accessToken.userId
                 });
             }
-
-
 
             console.log(getUserTokenAndId.value)
          
@@ -107,7 +134,7 @@ export const FacebookLoginExtension = () => {
 
                 userData.value = result;
 
-                await store.dispatch('GetFbUserDate', userData.value.data);
+                await store.dispatch('user/GetFbUserDate', userData.value.data);
                 console.log(`Facebook access token is ${result.accessToken.token}`);
             }
 
@@ -122,23 +149,13 @@ export const FacebookLoginExtension = () => {
     }
 
     async function GetFacebookUserProfile () {
-        const result = await FacebookLogin.getProfile({ fields: [
-                'email', 
-                'name', 
-                'id', 
-                'picture.width(720)', 
-                'hometown', 
-                'gender',
-                'birthday',
-                'location',
-                'languages'
-            ] 
-        });
+        const configField = [ 'email',  'name',  'id',  'picture.width(720)',  'hometown',  'gender', 'birthday', 'location', 'languages' ] 
+        const result = await FacebookLogin.getProfile({ fields: configField });
 
         await presentLoading(!result ? 1500 : 100)
         userData.value = result;
 
-        store.state.facebookUserData = userData.value;
+        store.state.user.facebookUserData = userData.value;
     }
 
     const ObserverFbAccessToken = async () => {
@@ -154,40 +171,54 @@ export const FacebookLoginExtension = () => {
     }
 
     async function LogoutFacebook () {
+        try {
+            const { FbAccessToken } = await ObserverFbAccessToken();
+            const { FbAccessId } = await ObserverFbAccessId();
 
-        const { FbAccessToken } = await ObserverFbAccessToken();
-        const { FbAccessId } = await ObserverFbAccessId();
+            if (FbAccessToken && FbAccessId) {
+                // await presentLoading(store.state.facebookUserData ? 500 : 0);
 
+                const PromiseConfig = [
+                    await Storage.remove({ key: 'fbAccessToken' }),
+                    await Storage.remove({ key: 'fbAccessId' }),
+                    await Storage.remove({ key: 'LoginWithFacebook' }),
+                ]
 
-        console.log('token: ', FbAccessToken);
-        console.log('id: ', FbAccessId);
+                Promise.all(PromiseConfig).then(async () => {
+                    console.log(store.state.user.facebookUserData);
+                    if (store.state.user.facebookUserData) {
+                        await FacebookLogin.logout()
+                        AsyncUserLoginPlatform().then(result => {
+                            console.log(result)
+                            store.state.user.facebookUserData = '';
 
-        if (FbAccessToken && FbAccessId) {
-            // await presentLoading(store.state.facebookUserData ? 500 : 0);
+                            function LogoutState() {
+                                let CurrentState = store.state.user.loginPlatform;
+                                CurrentState.facebook.state = false;
+                                return CurrentState
+                            }
 
-            console.log(1)
-            Promise.all([
-                await Storage.remove({ key: 'fbAccessToken' }),
-                await Storage.remove({ key: 'fbAccessId' })
-            ])
+                            store.state.user.loginPlatform && LogoutState();
+                        })
+                    }
+                })
 
-            console.log(store.state.facebookUserData)
-            if (store.state.facebookUserData) {
-                await await FacebookLogin.logout();
             }
+        } catch(LogOutError) {
+            console.log(LogOutError)
         }
 
-        store.state.facebookUserData = '';
 
     }
 
     return {
         store,
         userData,
-        CallInitializeFacebookLogin,
-        AsyncLoginCallback,
-        DefineFacebookAccessToken,
-        GetFacebookUserProfile,
         LogoutFacebook,
+        AsyncLoginCallback,
+        GetFacebookUserProfile,
+        DefineFacebookAccessToken,
+        CallInitializeFacebookLogin,
+        AsyncDetectedLoginWithFacebook
     }
 }
