@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 
 import { regions } from './regions'
-import { user    } from './authenticate'
+import { user } from './authenticate'
 
 export default createStore({
   state: {

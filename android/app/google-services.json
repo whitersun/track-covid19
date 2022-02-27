@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "227447683693",
+    "project_id": "trackcovid19-9d7fc",
+    "storage_bucket": "trackcovid19-9d7fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227447683693:android:5abf73abb7d7e2a2c29d64",
+        "android_client_info": {
+          "package_name": "com.track.covid19"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "227447683693-e4qi81i0pancqoc148e4k1fl31ed2f6k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.track.covid19",
+            "certificate_hash": "462b702535157fa1458e007db7108586e2d1673b"
+          }
+        },
+        {
+          "client_id": "227447683693-7bp665undg5ojobdl11ef8v57uldhpnb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj1WRBm0qRM8_E9S9Gx3nByQ9Hce1YuTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "227447683693-7bp665undg5ojobdl11ef8v57uldhpnb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

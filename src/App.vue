@@ -1,9 +1,3 @@
-<template>
-  <ion-app>
-    <ion-router-outlet />
-  </ion-app>
-</template>
-
 <script>
 import {
   IonApp,
@@ -26,15 +20,42 @@ export default {
 <script setup>
 import { useStore } from "vuex";
 import { App } from "@capacitor/app";
-import { onErrorCaptured } from "@vue/runtime-core";
+import { onErrorCaptured, onMounted } from "@vue/runtime-core";
+import { GoogleSignIn } from "@/hooks/GoogleSign";
 
 const store = useStore();
 window.store = store;
 
+const { GoogleInitialize } = GoogleSignIn();
+
+async function AlertExit() {
+  const alert = await alertController.create({
+    header: "Warning",
+    subHeader: "Exit Track Covid19 App",
+    message: "Are you sure wanna Exit?",
+    cssClass: "ExitAlert",
+    buttons: [
+      {
+        role: "cancel",
+        text: "cancel",
+      },
+      {
+        role: "confirm",
+        text: "Exit",
+        handler: () => {
+          App.exitApp();
+        },
+      },
+    ],
+  });
+
+  return alert.present();
+}
+
 const ionRouter = useIonRouter();
-useBackButton(-1, () => {
+useBackButton(-1, async () => {
   if (!ionRouter.canGoBack()) {
-    App.exitApp();
+    await AlertExit();
   }
 });
 
@@ -95,4 +116,20 @@ onErrorCaptured(async (e) => {
     return;
   }
 });
+
+onMounted(() => GoogleInitialize());
 </script>
+
+<style lang="scss">
+.ExitAlert {
+  .alert-title {
+    color: #fc4f4f;
+  }
+}
+</style>
+
+<template>
+  <ion-app>
+    <ion-router-outlet mode="ios" />
+  </ion-app>
+</template>

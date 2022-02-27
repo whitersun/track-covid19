@@ -7,4 +7,7 @@
     <string name="facebook_app_id">936359327018446</string>
     <string name="facebook_client_token">c987f1b7b9ecc259d13d90a6823d6a44</string>
     <string name="fb_login_protocol_scheme">936359327018446</string>
+
+    <string name="server_client_id">227447683693-7bp665undg5ojobdl11ef8v57uldhpnb.apps.googleusercontent.com</string>
+    <string name="google-signin-scope">profile email</string>
 </resources>

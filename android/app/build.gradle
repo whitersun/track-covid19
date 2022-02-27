@@ -21,6 +21,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    signingConfigs {
+        release {
+            storeFile file("../hash.keystore")
+            storePassword "aglumon1997"
+            keyAlias 'alias_name'
+            keyPassword 'aglumon1997'
+        }
+        debug {
+            storeFile file("../hash.keystore")
+            storePassword "aglumon1997"
+            keyAlias 'alias_name'
+            keyPassword 'aglumon1997'
+        }
+    }
 }
 
 repositories {
@@ -39,6 +53,11 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
     implementation 'com.facebook.android:facebook-login:latest.release'
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+
+    // Import the Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:29.1.0')
+    // Add the dependencies for the desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
 }
 
 apply from: 'capacitor.build.gradle'

@@ -16,7 +16,7 @@ const routes = [
       },
       {
         path: 'tab1',
-        component: () => import('@/views/Tab1Page.vue')
+        component: () => import('@/views/Homepage.vue')
       },
       {
         path: 'tab2',
@@ -24,10 +24,11 @@ const routes = [
       },
       {
         path: 'tab3',
-        component: () => import('@/views/TabTemplate003/Tab3Page.vue')
+        name: 'PersonalPage',
+        component: () => import('@/views/UserProfile/UserProfile.vue')
       }
     ]
-  }
+  },
 ]
 
 const router = createRouter({

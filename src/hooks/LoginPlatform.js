@@ -11,24 +11,33 @@ export function DetectedLoginPlatform () {
         
         async function isLineLoginGotFromStorage() {
             const { value: isLineLogin } = await Storage.get({ key: 'isLineLogin' });
+            
             return { isLineLogin }
         }
 
-        return { AsyncDetectedLoginWithFacebook, isLineLoginGotFromStorage }
+        async function isGoogleLoginGotFromStorage() {
+            const { value: isGoogleLogin } = await Storage.get({ key: 'isGoogleLogin' });
+            
+            return { isGoogleLogin }
+        }
+
+        return { AsyncDetectedLoginWithFacebook, isLineLoginGotFromStorage, isGoogleLoginGotFromStorage }
     } 
 
     const AsyncUserLoginPlatform = async () => {
 
-        const { AsyncDetectedLoginWithFacebook, isLineLoginGotFromStorage } = AsyncAllLoginPlatform();
+        const { AsyncDetectedLoginWithFacebook, isLineLoginGotFromStorage, isGoogleLoginGotFromStorage } = AsyncAllLoginPlatform();
 
         const UserLoginFacebook = ref('');
         const UserLoginWithLine = ref('');
+        const UserLoginWithGoogle = ref('');
 
         // TODO: fetch Data from AsyncDetectedLoginWithFacebook and isLineLoginGotFromStorage
         const { isLoginWithFacebook } = await AsyncDetectedLoginWithFacebook();
         const { isLineLogin } = await isLineLoginGotFromStorage();
+        const { isGoogleLogin } = await isGoogleLoginGotFromStorage();
 
-        [UserLoginFacebook.value, UserLoginWithLine.value] = [isLoginWithFacebook, isLineLogin];
+        [UserLoginFacebook.value, UserLoginWithLine.value, UserLoginWithGoogle.value] = [isLoginWithFacebook, isLineLogin, isGoogleLogin];
 
         const config = {
             ReturnFacebookObject: {
@@ -40,11 +49,16 @@ export function DetectedLoginPlatform () {
                 platform: "line",
                 state: UserLoginWithLine.value || false,
             },
+            ReturnGoogleObject: {
+                platform: "google",
+                state: UserLoginWithGoogle.value || false,
+            },
         };
 
         // TODO: if storage does not have any data
         if (!UserLoginFacebook.value) UserLoginFacebook.value = config.ReturnFacebookObject;
         if (!UserLoginWithLine.value) UserLoginWithLine.value = config.ReturnLineObject;
+        if (!UserLoginWithGoogle.value) UserLoginWithGoogle.value = config.ReturnGoogleObject;
 
         // TODO: if have facebook data in storage
         if (UserLoginFacebook.value) {
@@ -62,7 +76,20 @@ export function DetectedLoginPlatform () {
             }
         }
 
-        return { isLoginWithFacebook, isLineLogin, UserLoginWithFacebook: UserLoginFacebook.value, UserLoginWithLine: UserLoginWithLine.value };
+        if (UserLoginWithGoogle.value) {
+            if (UserLoginWithGoogle.value !== undefined) {
+                config.ReturnGoogleObject.state = isGoogleLogin || false;
+                UserLoginWithGoogle.value = config.ReturnGoogleObject;
+            }
+        }
+
+        return { 
+            isLoginWithFacebook, 
+            isLineLogin, 
+            UserLoginWithFacebook: UserLoginFacebook.value, 
+            UserLoginWithLine: UserLoginWithLine.value,
+            UserLoginWithGoogle: UserLoginWithGoogle.value,
+        };
     };
 
     return { AsyncUserLoginPlatform }

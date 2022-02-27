@@ -29,7 +29,7 @@ import { TotalData } from "@/hooks/TotalData";
 
 import ModalSearch from "@/components/organisms/ModalSearch.vue";
 
-const { info, structure, lastUpdated } = TotalData();
+const { info, structure, TodayStructure, lastUpdated } = TotalData();
 
 const store = useStore();
 
@@ -163,14 +163,17 @@ const doRefresh = async (event) => {
 
       await callToast();
     },
-    !store.state.loading ? 2000 : 0
+    !store.state.loading ? 500 : 0
   );
 };
 
 onBeforeMount(async () => {
+  console.log(navigator.geolocation);
   Promise.all([
     await store.dispatch("Region/CALL_GET_CURRENT_COUNTRY"),
     await store.dispatch("Region/CALL_TOTAL_REPORT"),
+    await store.dispatch("user/CheckFacebookUser"),
+    await store.dispatch("user/CheckLineUser"),
   ]);
 });
 </script>
@@ -241,6 +244,7 @@ ion-modal.ModalComponent {
 
 <template>
   <LayoutComponent HeaderTitle="Covid-19" HeaderTitleClass="text-uppercase">
+    <!-- Refresh Data -->
     <ion-refresher
       slot="fixed"
       pull-factor="0.5"
@@ -271,16 +275,31 @@ ion-modal.ModalComponent {
       :Label="lastUpdated"
       :HasButton="true"
     />
+
     <TitleLayout
       ClassName="SecondHomeTitleComponent"
-      Label="World wide"
+      Label="World wide Total"
       :LabelIcon="earthOutline"
     />
+
     <TabLayout
       mode="md"
       ClassName="HomeBoxComponent"
       :InfoData="info ? info : undefined"
       :structure="structure"
+    />
+
+    <TitleLayout
+      ClassName="SecondHomeTitleComponent"
+      Label="World wide Today"
+      :LabelIcon="earthOutline"
+    />
+
+    <TabLayout
+      mode="md"
+      ClassName="HomeBoxComponent"
+      :InfoData="info ? info : undefined"
+      :structure="TodayStructure"
     />
   </LayoutComponent>
 </template>

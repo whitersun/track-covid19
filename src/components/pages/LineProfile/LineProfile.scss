@@ -1,0 +1,80 @@
+.userLineProfile {
+  ion-img.user-avatar {
+    margin-bottom: 2rem;
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .skeleton-class {
+    width: 250px;
+    height: 250px;
+    border-radius: 25px;
+    margin: auto;
+  }
+
+  .skeleton-class-username {
+    width: 50%;
+    border-radius: 25px;
+  }
+
+  .skeleton-class-username {
+    width: 80%;
+    border-radius: 25px;
+  }
+
+  .skeleton-class-email {
+    width: 95%;
+    border-radius: 25px;
+  }
+
+  .userInfo {
+    .username {
+      font-size: 35px;
+    }
+
+    .userEmail {
+      font-size: 14px;
+    }
+  }
+
+  .flex-skeleton {
+    display: flex;
+    width: 100%;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+
+    column-gap: 10px;
+
+    .skeleton-class-1,
+    .skeleton-class-2 {
+      width: 50%;
+      height: 100px;
+      border-radius: 25px;
+    }
+  }
+
+  .skeleton-class-list {
+    width: 100%;
+    height: auto;
+    border-radius: 25px;
+  }
+
+  .box-footer {
+    ion-item {
+      border-radius: 15px;
+      --background: var(--ion-color-light);
+
+      @media (prefers-color-scheme: dark) {
+        --background: #333333;
+      }
+
+      &::part(native) {
+        border-radius: 15px;
+      }
+    }
+  }
+}

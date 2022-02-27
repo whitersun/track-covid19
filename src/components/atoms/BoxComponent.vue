@@ -32,7 +32,7 @@ defineProps({
   },
 
   BoxNumber: {
-    type: String,
+    type: [String, Number],
     required: false,
   },
 
@@ -78,6 +78,12 @@ defineProps({
     type: Boolean,
     required: false,
   },
+
+  NoteColor: {
+    type: String,
+    required: false,
+    default: "primary",
+  },
 });
 </script>
 
@@ -93,7 +99,7 @@ defineProps({
       <ion-icon size="default" :icon="Icon"></ion-icon>
       {{ BoxSubtitle }}
     </ion-label>
-    <ion-note color="primary">{{ BoxNumber }}</ion-note>
+    <ion-note :color="NoteColor">{{ BoxNumber }}</ion-note>
   </ion-item>
 </template>
 

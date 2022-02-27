@@ -11,25 +11,14 @@
       @searchKeyWordChange="$emit('searchKeyWordChange')"
       @keyup.enter="$emit('EnterSearch')"
     />
-    <!-- <SearchComponent
-      v-model.lazy="headerSearch"
-      SearchPlaceholder="Search Country..."
-      InputType="search"
-      @keyup.enter="submitSearch(headerSearch)"
-    /> -->
-
-    <ButtonComponent :ButtonIcon="ButtonIcon" @submitSearch="$emit('submitSearch')" />
-    <!-- <ButtonComponent
-      :ButtonIcon="searchOutline"
-      @submitSearch="submitSearch(headerSearch)"
-    /> -->
+    <ButtonsComponent :ButtonIcon="ButtonIcon" @ButtonEvent="$emit('submitSearch')" />
   </ion-item>
 </template>
 
 <script>
 import { IonItem } from "@ionic/vue";
 import SearchComponent from "@/components/atoms/SearchComponent.vue";
-import ButtonComponent from "@/components/atoms/ButtonComponent.vue";
+import ButtonsComponent from "@/components/atoms/ButtonsComponent.vue";
 
 export default {
   name: "SearchLayout",
@@ -37,7 +26,7 @@ export default {
     IonItem,
 
     SearchComponent,
-    ButtonComponent,
+    ButtonsComponent,
   },
 };
 </script>

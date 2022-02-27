@@ -28,6 +28,11 @@ defineProps({
     type: String,
     required: false,
   },
+  Color: {
+    type: String,
+    required: false,
+    default: "light",
+  },
 });
 </script>
 
@@ -36,7 +41,6 @@ defineProps({
     <GridComponent :Items="structure" Column="6">
       <template #default="{ item }">
         <BoxComponent
-          Color="light"
           Lines="none"
           :ClassName="ClassName"
           :Button="true"
@@ -44,6 +48,8 @@ defineProps({
           :Icon="item.icon"
           :BoxSubtitle="item.subtitle"
           :BoxNumber="item.number"
+          :NoteColor="item.hasOwnProperty('color') ? item.color : 'primary'"
+          :Color="item.hasOwnProperty('background') ? item.background : 'light'"
         />
       </template>
     </GridComponent>

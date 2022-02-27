@@ -1,14 +1,11 @@
-import { skullOutline, heartOutline, alertOutline, manOutline } from "ionicons/icons";
-import { useStore } from "vuex";
+import { skullOutline, heartOutline, alertOutline, manOutline, documentOutline } from "ionicons/icons";
 import { computed, ref } from "@vue/runtime-core";
 
-export const TotalData = () => {
-  const store = useStore();
+import { ReturnValue } from './DataReturn'
 
-  const info = computed(() => {
-    const _info = store.state.Region.TotalReports;
-    return _info ? _info : "";
-  });
+export const TotalData = () => {
+
+  const { store, info, confirmed, critical, deaths, recovered, TodayNewCase, TodayNewDeath, TodayNewRecovered, } = ReturnValue()
 
   const UserInCurrent = computed(() => store.state.Region.UserInCurrent);
 
@@ -24,32 +21,6 @@ export const TotalData = () => {
     return _lastUpdated ? Condition_1 : Condition_2;
   })
 
-  // TODO: confirmed
-  const confirmed = computed(() => {
-    let confirmedInfo = new Intl.NumberFormat().format(info.value.TotalCases);
-
-    return confirmedInfo.toString();
-  });
-
-  // TODO: critical
-  const critical = computed(() => {
-    let criticalInfo = new Intl.NumberFormat().format(info.value.TotCases_1M_Pop);
-
-    return criticalInfo.toString();
-  });
-
-  // TODO: deaths
-  const deaths = computed(() => {
-    let deathsInfo = new Intl.NumberFormat().format(info.value.TotalDeaths);
-
-    return deathsInfo.toString();
-  });
-
-  // TODO: recovered
-  const recovered = computed(() => {
-    let recoveredInfo = new Intl.NumberFormat().format(info.value.TotalRecovered);
-    return recoveredInfo.toString();
-  });
 
   const structure = ref([
     {
@@ -63,20 +34,47 @@ export const TotalData = () => {
       subtitle: "Critical",
       icon: alertOutline,
       number: critical,
+      color: 'warning'
     },
     {
       id: 3,
       subtitle: "Deaths",
       icon: skullOutline,
       number: deaths,
+      color: 'danger'
     },
     {
       id: 4,
       subtitle: "Recovered",
       icon: heartOutline,
       number: recovered,
+      color: 'success'
     },
   ]);
+
+  const TodayStructure = ref([
+    {
+      id: 1,
+      subtitle: "New Cases",
+      icon: documentOutline,
+      number: TodayNewCase,
+      color: 'primary'
+    },
+    {
+      id: 2,
+      subtitle: "New Deaths",
+      icon: skullOutline,
+      number: TodayNewDeath,
+      color: 'danger'
+    },
+    {
+      id: 3,
+      subtitle: "New Recovered",
+      icon: skullOutline,
+      number: TodayNewRecovered,
+      color: 'success'
+    },
+  ])
 
   return { 
     info, 
@@ -86,6 +84,7 @@ export const TotalData = () => {
     recovered,
     structure, 
     lastUpdated,
+    TodayStructure
   }
 
 }

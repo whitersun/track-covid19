@@ -4,6 +4,15 @@
   "webDir": "dist",
   "bundledWebRuntime": false,
 
+
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "227447683693-7bp665undg5ojobdl11ef8v57uldhpnb.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  },
+  
   "server": {
     "hostname": "com.track.covid19",
     "url": "http://192.168.31.239:3200",

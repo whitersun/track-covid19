@@ -24,6 +24,10 @@ export const regions = {
 
     GET_USER_IN_CURRENT_COUNTRY: (state, payload) => {
       return state.UserInCurrent = payload;
+    },
+
+    RETURN_LOADING: (state, payload) => {
+      return state.loading = payload;
     }
   },
 
@@ -59,7 +63,7 @@ export const regions = {
       commit('GET_REGION', response.data);
     },
 
-    CALL_TOTAL_REPORT: async ({ commit, state }) => {
+    CALL_TOTAL_REPORT: async ({ commit }) => {
       var options = {
         method: 'GET',
         url: 'https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/npm-covid-data/world',
@@ -74,16 +78,20 @@ export const regions = {
       if (response.status === 200) {
         console.log(response.data[0])
         commit('GET_TOTAL_REPORTS', response.data[0]);
-
-        state.loading = false;
-
-        return state.loading;
+        commit('RETURN_LOADING', false);
       }
     },
 
     CALL_GET_CURRENT_COUNTRY: async ({ commit }) => {
       const response = await axios.get('https://ipapi.co/json/');
+      // const response = await axios.request(options);
+      // const ip = '203.204.150.183';
+      // const key = '7b55d21cf94d47edbc84f40d5b2a0b8e'
+      // const response = await axios.request(`https://api.ipgeolocation.io/ipgeo?apiKey=${key}&ip=${ip}`);
 
+      // const response = await axios.get(`https://ipwhois.app/json/`);
+
+      console.log(response)
       if (response.status === 200) {
         // console.log(response);
         commit('GET_USER_IN_CURRENT_COUNTRY', response.data)

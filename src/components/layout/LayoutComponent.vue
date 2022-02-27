@@ -1,5 +1,13 @@
 <script>
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from "@ionic/vue";
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonBackButton,
+} from "@ionic/vue";
 
 export default {
   name: "LayoutComponent",
@@ -80,6 +88,11 @@ defineProps({
     required: false,
   },
 
+  HeaderTitleClassName: {
+    type: String,
+    required: false,
+  },
+
   HeaderTitleStyle: {
     type: String,
     required: false,
@@ -101,6 +114,22 @@ defineProps({
     required: false,
     default: true,
   },
+
+  BackRouterActive: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+
+  BackRouterText: {
+    type: String,
+    required: false,
+  },
+
+  BackRouter: {
+    type: [String, Object],
+    required: false,
+  },
 });
 </script>
 
@@ -117,12 +146,23 @@ defineProps({
         :class="HeaderToolbarClass"
         :style="HeaderToolbarStyle"
       >
+        <ion-buttons v-if="BackRouterActive" slot="start">
+          <ion-back-button
+            :text="BackRouterText"
+            :defaultHref="BackRouter"
+          ></ion-back-button>
+        </ion-buttons>
+
         <ion-title
           :size="HeaderTitleSize"
           :class="HeaderTitleClass"
           :style="HeaderTitleStyle"
+          @click="$emit('CallEvent')"
         >
-          {{ HeaderTitle }}
+          <div :class="HeaderTitleClassName">
+            <slot name="Avatar" />
+            <span>{{ HeaderTitle }}</span>
+          </div>
         </ion-title>
 
         <slot name="HeaderButton" />
@@ -140,8 +180,16 @@ defineProps({
           :class="HeaderToolbarClass"
           :style="HeaderTitleStyle"
         >
-          <ion-title :size="HeaderTitleSize" :class="HeaderTitleClass">
-            {{ HeaderTitle }}
+          <ion-title
+            color="dark"
+            :size="HeaderTitleSize"
+            :class="HeaderTitleClass"
+            @click="$emit('CallEvent')"
+          >
+            <div :class="HeaderTitleClassName">
+              <slot name="Avatar" />
+              <span>{{ HeaderTitle }}</span>
+            </div>
           </ion-title>
 
           <slot name="HeaderContentButton" />

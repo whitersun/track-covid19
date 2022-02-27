@@ -6,8 +6,9 @@ import { Storage } from '@capacitor/storage'
 
 // import axios from 'axios'
 import { Capacitor } from '@capacitor/core';
-import { alertController, loadingController } from '@ionic/vue';
-
+import { alertController } from '@ionic/vue';
+import { LoadingComponent, DismissLoadingComponent } from './Loading';
+import { DetectedLoginPlatform } from './LoginPlatform'
 
 async function AlertNotification ({ header: header, subHeader: subHeader, message: message }) {
     const alert = await alertController.create({
@@ -22,28 +23,16 @@ async function AlertNotification ({ header: header, subHeader: subHeader, messag
         }]
     })
 
-    return alert.present().then(async () => await loadingController.dismiss())
+    return alert.present().then(async () => await DismissLoadingComponent())
 }
 
-export const LineLogoutExtension = () => {
+export const LineLoginExtension = () => {
 
     const store = useStore();
     const LineUserData = ref('');
+    const AccessToken = ref('')
 
-    async function presentLoading(timeout) {
-      const loading = await loadingController
-        .create({
-          cssClass: 'my-custom-class',
-          message: 'Please wait...',
-          duration: timeout,
-        });
-        
-      await loading.present();
-      
-      setTimeout(async function() {
-        return await loading.dismiss()
-      }, timeout);
-    }
+    const { AsyncUserLoginPlatform } = DetectedLoginPlatform();
 
 
     function CallInitializeLineLogin() {
@@ -55,31 +44,49 @@ export const LineLogoutExtension = () => {
     }
 
     async function AsyncLineLoginCallback () {
-        CallInitializeLineLogin().then(async (result) => {
-            await presentLoading();
+        CallInitializeLineLogin().then((result) => {
             if (result === 'Initialize success channel line id.') {
                 const DeterminePlatform = ['web', 'ios'];
                 if (DeterminePlatform.includes(Capacitor.getPlatform())) CallLineUserLoginWithWeb();
-            } else await loadingController.dismiss()
-
+            }
         }).catch(async error => {
-            if (Capacitor.getPlatform() !== 'web') alert(error.message);
-            
             return await AlertNotification({
                 header: `Error System`,
                 subHeader: 'Line error message',
                 message: error.message,
-            }).then(async () => await loadingController.dismiss());
+            })
 
         }).finally(async () => {
-            Promise.all([ await CallLineUserLogin(), await CallAccessTokenLineLogin() ]).then(async (results) => {
-                alert('Access token: ' + results.accessToken);
-                alert('Expire Time: ' + results.expireTime);
+            const configCallLine = [ await CallLineUserLogin(), await CallAccessTokenLineLogin() ]
+            Promise.all(configCallLine).then(async (results) => AccessToken.value = results).catch ((errorLogin) => {
+                if (Capacitor.getPlatform() !== 'web') alert(errorLogin.message);
+                console.log(errorLogin)
+            }).finally(() => {
+                AsyncUserLoginPlatform().then(async (AfterLogin) => {
+                    await LoadingComponent();
 
-                return await AlertNotification({
-                    header: `Welcome ${LineUserData.value.displayName}`,
-                    subHeader: 'Line message',
-                    message: 'You are success login by using line,'
+                    const config = {
+                        facebook: { 
+                            platform: AfterLogin.UserLoginWithFacebook.platform,
+                            state: AfterLogin.UserLoginWithFacebook.state
+                        },
+                        line: { 
+                            platform: AfterLogin.UserLoginWithLine.platform,
+                            state: AfterLogin.UserLoginWithLine.state,
+                        },
+                        google: { 
+                            platform: AfterLogin.UserLoginWithGoogle.platform,
+                            state: AfterLogin.UserLoginWithGoogle.state,
+                        },
+                    };
+
+                    await store.dispatch("user/LoginPlatform", config)
+
+                    return await AlertNotification({
+                        header: `Welcome ${LineUserData.value.displayName}`,
+                        subHeader: 'Line message',
+                        message: 'You are success login by using line,'
+                    })
                 })
             })
 
@@ -89,9 +96,14 @@ export const LineLogoutExtension = () => {
 
     function CallLineUserLogin() {
         return new Promise(function (resolve, reject) {
-            LineLogin.login().then(response => {
+            LineLogin.login().then(async response => {
                 console.log(response);
                 LineUserData.value = response;
+
+                Promise.all([
+                    await store.dispatch('user/GetLineUserDate', response),
+                    await Storage.set({ key: 'LineUser', value: JSON.stringify(response) }),
+                ])
                 resolve(response);
                 return LineUserData.value
             }).catch(error => {
@@ -114,7 +126,7 @@ export const LineLogoutExtension = () => {
         LineLogin.getAccessToken(async function(result) {
             console.log(result); // {accessToken:'xxxxxxxx', expireTime: 123456789}
 
-            await Storage.set({ key: 'isLineLogin', value: true });
+            await Storage.set({ key: 'isLineLogin', value: "true" });
 
         }, function(error) {
             if (Capacitor.getPlatform() !== 'web') alert(error.message);
@@ -128,23 +140,65 @@ export const LineLogoutExtension = () => {
             console.log(result)
         }, function(error) {
             // failed
-            alert(error.message)
+            console.log(error.message)
+            // alert(error.message)
         });
     }
 
     function onLineLogout () {
         // logout...
-        LineLogin.logout(async function(result) {
-            console.log(result);
-            alert(result)
+
+        LineLogin.logout().then(async (result) => {
+            alert(result);
             LineUserData.value = ''
 
-            onLineVerifyAccessToken();
+            Promise.all([
+                await Storage.remove({ key: 'isLineLogin' }),
+                await Storage.remove({ key: 'LineUser' }),
+            ]).then(() => {
+                AsyncUserLoginPlatform().then(async () => {
+                    await store.dispatch('user/GetLineUserDate', '');
+                
+                    function LogoutState() {
+                        let CurrentState = store.state.user.loginPlatform;
+                        CurrentState.line.state = false;
+                        return CurrentState
+                    }
 
-            await Storage.remove({ key: 'isLineLogin' })
-        }, function(error) {
-            console.log(error);
+                    store.state.user.loginPlatform && LogoutState();
+                })
+            })
+
+
+
+        }).catch(error => {
+            alert(error.message)
         });
+
+        // LineLogin.logout(async function(result) {
+        //     console.log(result);
+        //     LineUserData.value = ''
+
+        //     // onLineVerifyAccessToken();
+        //     Promise.all([
+        //         await Storage.remove({ key: 'isLineLogin' }),
+        //         await Storage.remove({ key: 'LineUser' }),
+        //     ]).then(() => {
+        //         AsyncUserLoginPlatform().then(async () => {
+        //             await store.dispatch('user/GetLineUserDate', '');
+                
+        //             function LogoutState() {
+        //                 let CurrentState = store.state.user.loginPlatform;
+        //                 CurrentState.line.state = false;
+        //                 return CurrentState
+        //             }
+
+        //             store.state.user.loginPlatform && LogoutState();
+        //         })
+        //     })
+        // }, function(error) {
+        //     console.log(error);
+        // });
     }
 
     async function isLineLoginGotFromStorage() {
@@ -152,13 +206,27 @@ export const LineLogoutExtension = () => {
         return { isLineLogin }
     }
 
+    async function isLineUserFromStorage() {
+        const { value: LineUser } = await Storage.get({ key: 'LineUser' });
+        return { LineUser }
+    }
+
+    async function RefetchLineLogin() {
+        if (!LineUserData.value) {
+            onLineVerifyAccessToken();
+        }
+    }
+
     return {
         store,
+        AccessToken,
         LineUserData,
         onLineLogout,
+        RefetchLineLogin,
         CallInitializeLineLogin,
         AsyncLineLoginCallback,
         isLineLoginGotFromStorage,
         onLineVerifyAccessToken,
+        isLineUserFromStorage
     }
 }

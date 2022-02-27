@@ -1,24 +1,20 @@
 <template>
-  <ion-button
-    :color="Color"
-    :expand="Expand"
-    :class="ClassName"
-    :size="ButtonSize"
-    :slot="SlotPosition"
-    @click="$emit('ButtonEvent')"
-  >
-    <ion-icon v-if="ButtonIcon" slot="start" :icon="ButtonIcon"></ion-icon>
-    <slot v-if="ButtonText">{{ ButtonText }}</slot>
-    <slot />
-  </ion-button>
+  <ion-buttons :expand="Expand" :slot="SlotPosition" :class="ClassName">
+    <ion-button :color="Color" :size="ButtonSize" @click="$emit('ButtonEvent')">
+      <ion-icon v-if="ButtonIcon" slot="start" :icon="ButtonIcon"></ion-icon>
+      <slot v-if="ButtonText">{{ ButtonText }}</slot>
+      <slot />
+    </ion-button>
+  </ion-buttons>
 </template>
 
 <script>
-import { IonButton, IonIcon } from "@ionic/vue";
+import { IonButtons, IonButton, IonIcon } from "@ionic/vue";
 
 export default {
-  name: "ButtonComponent",
+  name: "ButtonsComponent",
   components: {
+    IonButtons,
     IonButton,
     IonIcon,
   },
